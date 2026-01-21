@@ -1,0 +1,13 @@
+<h1>Welcome {{ request.user.email }}</h1>
+
+{% if request.user.is_premium %}
+<p>Premium User 🌟</p>
+{% else %}
+<p>Free User</p>
+<a href="#">Upgrade to Premium</a>
+{% endif %}
+
+<form method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+</form>
