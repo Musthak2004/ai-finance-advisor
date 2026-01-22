@@ -1,13 +1,68 @@
-<h1>Welcome {{ request.user.email }}</h1>
+<h1>Dashboard</h1>
+<p>User: {{ request.user.email }}</p>
+<p>Total Income: {{ total_income }}</p>
+<p>Total Expense: {{ total_expense }}</p>
+<p>Savings: {{ savings }}</p>
 
-{% if request.user.is_premium %}
-<p>Premium User 🌟</p>
-{% else %}
-<p>Free User</p>
-<a href="#">Upgrade to Premium</a>
-{% endif %}
+<h3>Add Income</h3>
+<form method="post">
+  {% csrf_token %} {{ i_form.as_p }}
+  <button type="submit" name="income_submit">Add Income</button>
+</form>
+
+<h3>Add Expense</h3>
+<form method="post">
+  {% csrf_token %} {{ e_form.as_p }}
+  <button type="submit" name="expense_submit">Add Expense</button>
+</form>
+
+<h3>Recent Transactions</h3>
+<ul>
+  {% for income in incomes %}
+  <li>Income: {{ income.title }} - {{ income.amount }}</li>
+  {% endfor %} {% for expense in expenses %}
+  <li>Expense: {{ expense.title }} - {{ expense.amount }}</li>
+  {% endfor %}
+</ul>
 
 <form method="post" action="{% url 'logout' %}">
   {% csrf_token %}
   <button type="submit">Logout</button>
 </form>
+{% if request.user.is_premium %}
+<p>Premium Features Enabled ✅</p>
+{% else %}
+<a href="#">Upgrade to Premium</a>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="financeChart" width="400" height="200"></canvas>
+
+<script>
+  const ctx = document.getElementById('financeChart').getContext('2d');
+  const financeChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: ['Income', 'Expenses', 'Savings'],
+          datasets: [{
+              label: 'Finance Overview',
+              data: [{{ total_income }}, {{ total_expense }}, {{ savings }}],
+              backgroundColor: [
+                  'rgba(75, 192, 192, 0.7)',
+                  'rgba(255, 99, 132, 0.7)',
+                  'rgba(255, 206, 86, 0.7)'
+              ],
+              borderColor: [
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(255, 206, 86, 1)'
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true
+      }
+  });
+</script>
